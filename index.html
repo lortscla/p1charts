@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Overview - Trading Desktop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+        
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #131920;
+            --bg-tertiary: #1a2128;
+            --border-color: #2a3441;
+            --text-primary: #e6e8eb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --green: #00d97e;
+            --red: #f7685b;
+            --blue: #2d8cf0;
+            --purple: #8b5cf6;
+            --orange: #ff9f43;
+            --cyan: #00b8d4;
+            --grid-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 24px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header-left h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-left .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        
+        .time-range {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .time-btn {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+        
+        .time-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .time-btn.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            position: relative;
+            animation: scaleIn 0.6s ease-out 0.1s backwards;
+        }
+        
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 500px;
+        }
+        
+        .legend-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: slideUp 0.5s ease-out backwards;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .legend-item:nth-child(1) { animation-delay: 0.1s; }
+        .legend-item:nth-child(2) { animation-delay: 0.15s; }
+        .legend-item:nth-child(3) { animation-delay: 0.2s; }
+        .legend-item:nth-child(4) { animation-delay: 0.25s; }
+        .legend-item:nth-child(5) { animation-delay: 0.3s; }
+        
+        .legend-item:hover {
+            background: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .legend-item.disabled {
+            opacity: 0.4;
+        }
+        
+        .legend-color {
+            width: 4px;
+            height: 32px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        
+        .legend-info {
+            flex: 1;
+        }
+        
+        .legend-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+        
+        .legend-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .legend-change {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .legend-change.positive {
+            color: var(--green);
+            background: rgba(0, 217, 126, 0.1);
+        }
+        
+        .legend-change.negative {
+            color: var(--red);
+            background: rgba(247, 104, 91, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .stat-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>MARKET OVERVIEW</h1>
+                <div class="subtitle">MAJOR INDICES • 5-DAY PERFORMANCE</div>
+            </div>
+            <div class="time-range">
+                <button class="time-btn">1D</button>
+                <button class="time-btn active">1W</button>
+                <button class="time-btn">1M</button>
+                <button class="time-btn">3M</button>
+                <button class="time-btn">YTD</button>
+                <button class="time-btn">1Y</button>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="legend-container">
+                <div class="legend-item" data-index="0">
+                    <div class="legend-color" style="background: var(--blue);"></div>
+                    <div class="legend-info">
+                        <div class="legend-name">S&P 500</div>
+                        <div class="legend-value">
+                            5,847.23
+                            <span class="legend-change positive">+1.42%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legend-item" data-index="1">
+                    <div class="legend-color" style="background: var(--green);"></div>
+                    <div class="legend-info">
+                        <div class="legend-name">NASDAQ 100</div>
+                        <div class="legend-value">
+                            20,634.15
+                            <span class="legend-change positive">+2.18%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legend-item" data-index="2">
+                    <div class="legend-color" style="background: var(--purple);"></div>
+                    <div class="legend-info">
+                        <div class="legend-name">DOW JONES</div>
+                        <div class="legend-value">
+                            43,987.91
+                            <span class="legend-change positive">+0.78%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legend-item" data-index="3">
+                    <div class="legend-color" style="background: var(--orange);"></div>
+                    <div class="legend-info">
+                        <div class="legend-name">RUSSELL 2000</div>
+                        <div class="legend-value">
+                            2,234.56
+                            <span class="legend-change negative">-0.34%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="legend-item" data-index="4">
+                    <div class="legend-color" style="background: var(--cyan);"></div>
+                    <div class="legend-info">
+                        <div class="legend-name">VIX</div>
+                        <div class="legend-value">
+                            14.28
+                            <span class="legend-change negative">-8.42%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-wrapper">
+                <canvas id="marketChart"></canvas>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Volume (Avg)</div>
+                    <div class="stat-value">3.2B</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Gainers</div>
+                    <div class="stat-value" style="color: var(--green);">342</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Decliners</div>
+                    <div class="stat-value" style="color: var(--red);">187</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">52-Wk High</div>
+                    <div class="stat-value">23</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">52-Wk Low</div>
+                    <div class="stat-value">8</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate realistic market data for the past week
+        function generateMarketData() {
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+            
+            // Base values and generate realistic fluctuations
+            const datasets = [
+                {
+                    label: 'S&P 500',
+                    base: 5847.23,
+                    volatility: 0.008,
+                    color: 'rgba(45, 140, 240, 1)',
+                    bgColor: 'rgba(45, 140, 240, 0.05)'
+                },
+                {
+                    label: 'NASDAQ 100',
+                    base: 20634.15,
+                    volatility: 0.012,
+                    color: 'rgba(0, 217, 126, 1)',
+                    bgColor: 'rgba(0, 217, 126, 0.05)'
+                },
+                {
+                    label: 'DOW JONES',
+                    base: 43987.91,
+                    volatility: 0.007,
+                    color: 'rgba(139, 92, 246, 1)',
+                    bgColor: 'rgba(139, 92, 246, 0.05)'
+                },
+                {
+                    label: 'RUSSELL 2000',
+                    base: 2234.56,
+                    volatility: 0.010,
+                    color: 'rgba(255, 159, 67, 1)',
+                    bgColor: 'rgba(255, 159, 67, 0.05)'
+                },
+                {
+                    label: 'VIX',
+                    base: 14.28,
+                    volatility: 0.15,
+                    color: 'rgba(0, 184, 212, 1)',
+                    bgColor: 'rgba(0, 184, 212, 0.05)'
+                }
+            ];
+            
+            return datasets.map(ds => {
+                const data = [];
+                let current = ds.base * 0.986; // Start lower for the week
+                
+                for (let i = 0; i < 5; i++) {
+                    const change = (Math.random() - 0.45) * ds.volatility * ds.base;
+                    current += change;
+                    data.push(current);
+                }
+                
+                // Normalize to percentage change from start
+                const start = data[0];
+                const normalized = data.map(val => ((val - start) / start) * 100);
+                
+                return {
+                    label: ds.label,
+                    data: normalized,
+                    borderColor: ds.color,
+                    backgroundColor: ds.bgColor,
+                    borderWidth: 2.5,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: ds.color,
+                    pointBorderColor: '#0a0e14',
+                    pointBorderWidth: 2,
+                    fill: true
+                };
+            });
+        }
+        
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: generateMarketData()
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(19, 25, 32, 0.95)',
+                        titleColor: '#e6e8eb',
+                        bodyColor: '#9ca3af',
+                        titleFont: {
+                            family: 'JetBrains Mono',
+                            size: 12,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            family: 'JetBrains Mono',
+                            size: 11
+                        },
+                        padding: 12,
+                        borderColor: '#2a3441',
+                        borderWidth: 1,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y.toFixed(2) + '%';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: 'JetBrains Mono',
+                                size: 11,
+                                weight: '600'
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: 'JetBrains Mono',
+                                size: 11,
+                                weight: '600'
+                            },
+                            callback: function(value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Toggle dataset visibility on legend click
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                const meta = chart.getDatasetMeta(index);
+                meta.hidden = !meta.hidden;
+                this.classList.toggle('disabled');
+                chart.update();
+            });
+        });
+        
+        // Time range button interactivity
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
