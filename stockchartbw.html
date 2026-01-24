@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intraday Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Mono', monospace;
+            background: #fafbfc;
+            color: #1a1d23;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .time-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .time-btn {
+            font-family: 'DM Mono', monospace;
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .time-btn:hover {
+            color: #4b5563;
+        }
+        
+        .time-btn.active {
+            color: #1a1d23;
+            border-bottom-color: #1a1d23;
+        }
+        
+        .price-info {
+            text-align: right;
+            font-size: 9px;
+            color: #6b7280;
+        }
+        
+        .previous-close {
+            margin-bottom: 2px;
+        }
+        
+        .close-value {
+            color: #4b5563;
+            margin-left: 6px;
+        }
+        
+        .chart-container {
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid #e1e4e8;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chart-header">
+            <div class="time-buttons">
+                <button class="time-btn active">1D</button>
+                <button class="time-btn">5D</button>
+                <button class="time-btn">1M</button>
+                <button class="time-btn">6M</button>
+                <button class="time-btn">YTD</button>
+                <button class="time-btn">1Y</button>
+                <button class="time-btn">5Y</button>
+                <button class="time-btn">Max</button>
+            </div>
+            <div class="price-info">
+                <div class="previous-close">
+                    Previous close <span class="close-value">248.35</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-wrapper">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate realistic intraday stock data
+        function generateIntradayData() {
+            const times = [];
+            const prices = [];
+            
+            // Generate times from 9:30 AM to 4:00 PM (market hours)
+            const startHour = 9;
+            const startMinute = 30;
+            const endHour = 16;
+            const endMinute = 0;
+            
+            let currentTime = startHour * 60 + startMinute;
+            const endTime = endHour * 60 + endMinute;
+            const interval = 5; // 5 minute intervals
+            
+            let currentPrice = 245.5;
+            const volatility = 0.8;
+            
+            while (currentTime <= endTime) {
+                const hours = Math.floor(currentTime / 60);
+                const minutes = currentTime % 60;
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const displayHour = hours > 12 ? hours - 12 : hours;
+                
+                // Only show time labels at key points
+                if (minutes === 0) {
+                    times.push(`${displayHour}:00${ampm}`);
+                } else {
+                    times.push('');
+                }
+                
+                // Generate price with some volatility
+                const change = (Math.random() - 0.48) * volatility;
+                currentPrice += change;
+                
+                // Add some realistic patterns
+                if (currentTime < 11 * 60) {
+                    // Morning volatility
+                    currentPrice += (Math.random() - 0.3) * 0.5;
+                } else if (currentTime > 15 * 60) {
+                    // End of day movement
+                    currentPrice += (Math.random() - 0.55) * 0.3;
+                }
+                
+                prices.push(currentPrice);
+                currentTime += interval;
+            }
+            
+            return { times, prices };
+        }
+        
+        const data = generateIntradayData();
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.times,
+                datasets: [{
+                    data: data.prices,
+                    borderColor: '#4b5563',
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) {
+                            return null;
+                        }
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(75, 85, 99, 0.02)');
+                        gradient.addColorStop(0.5, 'rgba(75, 85, 99, 0.08)');
+                        gradient.addColorStop(1, 'rgba(75, 85, 99, 0.15)');
+                        return gradient;
+                    },
+                    borderWidth: 1.5,
+                    tension: 0,
+                    pointRadius: 0,
+                    pointHoverRadius: 3,
+                    pointBackgroundColor: '#4b5563',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        titleColor: '#1a1d23',
+                        bodyColor: '#4b5563',
+                        titleFont: {
+                            family: 'DM Mono',
+                            size: 10,
+                            weight: '500'
+                        },
+                        bodyFont: {
+                            family: 'DM Mono',
+                            size: 9
+                        },
+                        padding: 8,
+                        borderColor: '#e1e4e8',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label || '';
+                            },
+                            label: function(context) {
+                                return '$' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: 'DM Mono',
+                                size: 9,
+                                weight: '500'
+                            },
+                            maxRotation: 0,
+                            autoSkip: true,
+                            autoSkipPadding: 20
+                        }
+                    },
+                    y: {
+                        position: 'right',
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.06)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: 'DM Mono',
+                                size: 9,
+                                weight: '500'
+                            },
+                            callback: function(value) {
+                                return value.toFixed(0);
+                            },
+                            count: 5
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Time range button interactivity
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Generate new data based on selected range
+                const newData = generateIntradayData();
+                chart.data.labels = newData.times;
+                chart.data.datasets[0].data = newData.prices;
+                chart.update();
+            });
+        });
+    </script>
+</body>
+</html>
