@@ -8,17 +8,17 @@
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
         
         :root {
-            --bg-primary: #0a0e14;
-            --bg-secondary: #131920;
-            --bg-tertiary: #1a2128;
-            --border-color: #2a3441;
-            --text-primary: #e6e8eb;
-            --text-secondary: #9ca3af;
-            --text-muted: #6b7280;
-            --gray-1: #2d3339;
-            --gray-2: #3d4349;
-            --gray-3: #4d5359;
-            --gray-4: #5d6369;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --border-color: #dee2e6;
+            --text-primary: #1a1d1f;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --green: #00d97e;
+            --yellow: #ffd93d;
+            --orange: #ff9f43;
+            --red: #f7685b;
         }
         
         * {
@@ -101,6 +101,7 @@
             border-radius: 8px;
             padding: 16px;
             border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
         
         .heatmap-grid {
@@ -115,13 +116,13 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
         }
         
         .heatmap-cell:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.15);
         }
         
         .cell-symbol {
@@ -129,7 +130,7 @@
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 6px;
-            color: rgba(255, 255, 255, 0.95);
+            color: var(--text-primary);
         }
         
         .cell-price {
@@ -137,7 +138,7 @@
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 4px;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
         }
         
         .cell-change {
@@ -149,36 +150,42 @@
         .cell-volume {
             font-family: 'DM Mono', monospace;
             font-size: 8px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             margin-top: 6px;
         }
         
-        /* Grayscale gradients based on performance */
+        /* Color gradients based on performance - using legend colors */
         .perf-strong-positive {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
+            background-color: #00d97e;
         }
         
         .perf-positive {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 100%);
+            background-color: #ffd93d;
         }
         
         .perf-negative {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.1) 100%);
+            background-color: #ff9f43;
         }
         
         .perf-strong-negative {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.18) 100%);
+            background-color: #f7685b;
         }
         
         .legend {
             display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
             margin-top: 12px;
             font-family: 'DM Mono', monospace;
             font-size: 8px;
             color: var(--text-muted);
+        }
+        
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .legend-gradient {
@@ -195,8 +202,15 @@
         
         .legend-labels {
             display: flex;
-            gap: 8px;
-            align-items: center;
+            justify-content: space-between;
+            width: 200px;
+            margin-left: auto;
+        }
+        
+        .legend-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
     </style>
 </head>
@@ -206,7 +220,6 @@
             <div class="header-left">
                 <div class="watchlist-name">tech</div>
                 <div class="tab-group">
-                    <div class="tab">Watchlist</div>
                     <div class="tab active">Heatmap</div>
                 </div>
             </div>
@@ -221,12 +234,14 @@
             <div class="heatmap-grid" id="heatmapGrid"></div>
             
             <div class="legend">
-                <span>Performance:</span>
-                <div class="legend-gradient">
-                    <div class="legend-segment" style="background: #0a0a0a;"></div>
-                    <div class="legend-segment" style="background: #2a2a2a;"></div>
-                    <div class="legend-segment" style="background: #5a5a5a;"></div>
-                    <div class="legend-segment" style="background: #8a8a8a;"></div>
+                <div class="legend-row">
+                    <span>Performance</span>
+                    <div class="legend-gradient">
+                        <div class="legend-segment" style="background: #f7685b;"></div>
+                        <div class="legend-segment" style="background: #ff9f43;"></div>
+                        <div class="legend-segment" style="background: #ffd93d;"></div>
+                        <div class="legend-segment" style="background: #00d97e;"></div>
+                    </div>
                 </div>
                 <div class="legend-labels">
                     <span>Negative</span>
@@ -271,7 +286,7 @@
                 cell.className = `heatmap-cell ${getPerformanceClass(stock.changePercent)}`;
                 cell.style.animationDelay = `${index * 0.05}s`;
                 
-                const changeColor = stock.change >= 0 ? '#9ca3af' : '#6b7280';
+                const changeColor = stock.change >= 0 ? '#00d97e' : '#f7685b';
                 
                 cell.innerHTML = `
                     <div class="cell-symbol">${stock.symbol}</div>
