@@ -6,7 +6,7 @@
     <title>Sector Allocation - Light Mode</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
         
         * {
             margin: 0;
@@ -15,7 +15,7 @@
         }
         
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
+            font-family: 'Lato', -apple-system, sans-serif;
             background: #fafbfc;
             color: #1a1d23;
             padding: 16px;
@@ -32,16 +32,16 @@
         }
         
         .title {
-            font-family: 'DM Mono', monospace;
-            font-size: 14px;
-            font-weight: 500;
+            font-family: 'Lato', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
             color: #1a1d23;
             margin-bottom: 4px;
         }
         
         .subtitle {
-            font-family: 'DM Mono', monospace;
-            font-size: 9px;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -57,7 +57,7 @@
         
         .chart-wrapper {
             position: relative;
-            height: 350px;
+            height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -96,16 +96,16 @@
         }
         
         .legend-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 10px;
+            font-family: 'Lato', sans-serif;
+            font-size: 12px;
             color: #4b5563;
             margin-bottom: 2px;
         }
         
         .legend-value {
-            font-family: 'DM Mono', monospace;
-            font-size: 13px;
-            font-weight: 600;
+            font-family: 'Lato', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
             color: #1a1d23;
         }
     </style>
@@ -172,7 +172,7 @@
         const ctx = document.getElementById('sectorChart').getContext('2d');
         
         const chart = new Chart(ctx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: ['Technology', 'Communication', 'Consumer Cyclical', 'Automotive', 'Other'],
                 datasets: [{
@@ -185,10 +185,12 @@
                         '#f59e0b'
                     ],
                     borderColor: '#ffffff',
-                    borderWidth: 3
+                    borderWidth: 0,
+                    borderRadius: 6
                 }]
             },
             options: {
+                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -200,13 +202,13 @@
                         titleColor: '#1a1d23',
                         bodyColor: '#4b5563',
                         titleFont: {
-                            family: 'DM Mono',
-                            size: 11,
-                            weight: '600'
+                            family: 'Lato',
+                            size: 13,
+                            weight: '700'
                         },
                         bodyFont: {
-                            family: 'DM Mono',
-                            size: 10
+                            family: 'Lato',
+                            size: 12
                         },
                         padding: 10,
                         borderColor: '#e1e4e8',
@@ -214,12 +216,46 @@
                         displayColors: true,
                         callbacks: {
                             label: function(context) {
-                                return context.label + ': ' + context.parsed + '%';
+                                return context.parsed.x + '%';
                             }
                         }
                     }
                 },
-                cutout: '65%'
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 60,
+                        grid: {
+                            color: '#f0f0f0',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Lato',
+                                size: 11
+                            },
+                            color: '#6b7280',
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Lato',
+                                size: 12,
+                                weight: '400'
+                            },
+                            color: '#1a1d23',
+                            padding: 10
+                        }
+                    }
+                }
             }
         });
     </script>
