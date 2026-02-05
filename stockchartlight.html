@@ -180,18 +180,7 @@
                 datasets: [{
                     data: data.prices,
                     borderColor: '#4b5563',
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) {
-                            return null;
-                        }
-                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, 'rgba(75, 85, 99, 0.02)');
-                        gradient.addColorStop(0.5, 'rgba(75, 85, 99, 0.08)');
-                        gradient.addColorStop(1, 'rgba(75, 85, 99, 0.15)');
-                        return gradient;
-                    },
+                    backgroundColor: 'rgba(59, 130, 246, 0.3)',
                     borderWidth: 1.5,
                     tension: 0,
                     pointRadius: 0,

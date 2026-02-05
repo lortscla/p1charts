@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intraday Chart - Dark Mode</title>
+    <title>Intraday Chart</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
@@ -16,8 +16,8 @@
         
         body {
             font-family: 'DM Mono', monospace;
-            background: #0a0c10;
-            color: #e5e7eb;
+            background: #fafbfc;
+            color: #1a1d23;
             padding: 16px;
             min-height: 100vh;
         }
@@ -53,12 +53,12 @@
         }
         
         .time-btn:hover {
-            color: #9ca3af;
+            color: #4b5563;
         }
         
         .time-btn.active {
-            color: #f9fafb;
-            border-bottom-color: #f9fafb;
+            color: #1a1d23;
+            border-bottom-color: #1a1d23;
         }
         
         .price-info {
@@ -72,17 +72,17 @@
         }
         
         .close-value {
-            color: #9ca3af;
+            color: #4b5563;
             margin-left: 6px;
         }
         
         .chart-container {
-            background: #161a21;
+            background: #ffffff;
             border-radius: 6px;
             padding: 16px;
-            border: 1px solid #1f2937;
+            border: 1px solid #e1e4e8;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
         
         .chart-wrapper {
@@ -179,25 +179,14 @@
                 labels: data.times,
                 datasets: [{
                     data: data.prices,
-                    borderColor: '#9ca3af',
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) {
-                            return null;
-                        }
-                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, 'rgba(156, 163, 175, 0.02)');
-                        gradient.addColorStop(0.5, 'rgba(156, 163, 175, 0.08)');
-                        gradient.addColorStop(1, 'rgba(156, 163, 175, 0.15)');
-                        return gradient;
-                    },
+                    borderColor: '#4b5563',
+                    backgroundColor: 'rgba(59, 130, 246, 0.3)',
                     borderWidth: 1.5,
                     tension: 0,
                     pointRadius: 0,
                     pointHoverRadius: 3,
-                    pointBackgroundColor: '#9ca3af',
-                    pointBorderColor: '#161a21',
+                    pointBackgroundColor: '#4b5563',
+                    pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
                     fill: true
                 }]
@@ -215,9 +204,9 @@
                     },
                     tooltip: {
                         enabled: true,
-                        backgroundColor: 'rgba(22, 26, 33, 0.98)',
-                        titleColor: '#f9fafb',
-                        bodyColor: '#9ca3af',
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        titleColor: '#1a1d23',
+                        bodyColor: '#4b5563',
                         titleFont: {
                             family: 'DM Mono',
                             size: 10,
@@ -228,7 +217,7 @@
                             size: 9
                         },
                         padding: 8,
-                        borderColor: '#1f2937',
+                        borderColor: '#e1e4e8',
                         borderWidth: 1,
                         displayColors: false,
                         callbacks: {
@@ -262,7 +251,7 @@
                     y: {
                         position: 'right',
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.04)',
+                            color: 'rgba(0, 0, 0, 0.06)',
                             drawBorder: false
                         },
                         ticks: {

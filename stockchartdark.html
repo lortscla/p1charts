@@ -16,8 +16,8 @@
         
         body {
             font-family: 'DM Mono', monospace;
-            background: #0a0c10;
-            color: #e5e7eb;
+            background: #000000;
+            color: #ffffff;
             padding: 16px;
             min-height: 100vh;
         }
@@ -44,7 +44,7 @@
             padding: 6px 12px;
             background: transparent;
             border: none;
-            color: #6b7280;
+            color: #9ca3af;
             font-size: 10px;
             font-weight: 500;
             cursor: pointer;
@@ -53,18 +53,18 @@
         }
         
         .time-btn:hover {
-            color: #9ca3af;
+            color: #d1d5db;
         }
         
         .time-btn.active {
-            color: #f9fafb;
-            border-bottom-color: #f9fafb;
+            color: #ffffff;
+            border-bottom-color: #ffffff;
         }
         
         .price-info {
             text-align: right;
             font-size: 9px;
-            color: #6b7280;
+            color: #9ca3af;
         }
         
         .previous-close {
@@ -72,17 +72,17 @@
         }
         
         .close-value {
-            color: #9ca3af;
+            color: #d1d5db;
             margin-left: 6px;
         }
         
         .chart-container {
-            background: #161a21;
+            background: #000000;
             border-radius: 6px;
             padding: 16px;
-            border: 1px solid #1f2937;
+            border: 1px solid #374151;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
         
         .chart-wrapper {
@@ -119,7 +119,7 @@
     </div>
 
     <script>
-        // Generate realistic intraday stock data
+        // Generate realistic intraday stock data with fixed seed for consistency
         function generateIntradayData() {
             const times = [];
             const prices = [];
@@ -137,6 +137,13 @@
             let currentPrice = 245.5;
             const volatility = 0.8;
             
+            // Use a seeded random for consistent results
+            let seed = 12345;
+            function seededRandom() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            }
+            
             while (currentTime <= endTime) {
                 const hours = Math.floor(currentTime / 60);
                 const minutes = currentTime % 60;
@@ -151,16 +158,16 @@
                 }
                 
                 // Generate price with some volatility
-                const change = (Math.random() - 0.48) * volatility;
+                const change = (seededRandom() - 0.48) * volatility;
                 currentPrice += change;
                 
                 // Add some realistic patterns
                 if (currentTime < 11 * 60) {
                     // Morning volatility
-                    currentPrice += (Math.random() - 0.3) * 0.5;
+                    currentPrice += (seededRandom() - 0.3) * 0.5;
                 } else if (currentTime > 15 * 60) {
                     // End of day movement
-                    currentPrice += (Math.random() - 0.55) * 0.3;
+                    currentPrice += (seededRandom() - 0.55) * 0.3;
                 }
                 
                 prices.push(currentPrice);
@@ -179,25 +186,14 @@
                 labels: data.times,
                 datasets: [{
                     data: data.prices,
-                    borderColor: '#9ca3af',
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) {
-                            return null;
-                        }
-                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                        gradient.addColorStop(0, 'rgba(156, 163, 175, 0.02)');
-                        gradient.addColorStop(0.5, 'rgba(156, 163, 175, 0.08)');
-                        gradient.addColorStop(1, 'rgba(156, 163, 175, 0.15)');
-                        return gradient;
-                    },
+                    borderColor: '#ffffff',
+                    backgroundColor: 'rgba(59, 130, 246, 0.3)',
                     borderWidth: 1.5,
                     tension: 0,
                     pointRadius: 0,
                     pointHoverRadius: 3,
-                    pointBackgroundColor: '#9ca3af',
-                    pointBorderColor: '#161a21',
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#000000',
                     pointBorderWidth: 2,
                     fill: true
                 }]
@@ -215,9 +211,9 @@
                     },
                     tooltip: {
                         enabled: true,
-                        backgroundColor: 'rgba(22, 26, 33, 0.98)',
-                        titleColor: '#f9fafb',
-                        bodyColor: '#9ca3af',
+                        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#d1d5db',
                         titleFont: {
                             family: 'DM Mono',
                             size: 10,
@@ -228,7 +224,7 @@
                             size: 9
                         },
                         padding: 8,
-                        borderColor: '#1f2937',
+                        borderColor: '#4b5563',
                         borderWidth: 1,
                         displayColors: false,
                         callbacks: {
@@ -248,7 +244,7 @@
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#6b7280',
+                            color: '#9ca3af',
                             font: {
                                 family: 'DM Mono',
                                 size: 9,
@@ -262,11 +258,11 @@
                     y: {
                         position: 'right',
                         grid: {
-                            color: 'rgba(255, 255, 255, 0.04)',
+                            color: 'rgba(255, 255, 255, 0.1)',
                             drawBorder: false
                         },
                         ticks: {
-                            color: '#6b7280',
+                            color: '#9ca3af',
                             font: {
                                 family: 'DM Mono',
                                 size: 9,
